@@ -1,5 +1,9 @@
 import pandas as pd
 import tensorflow as tf
+import nltk
+import re
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer # Stemming
 from tensorflow.keras.layers import Embedding, LSTM, Dense
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import one_hot
@@ -31,10 +35,26 @@ def preprocess_data(df):
     return df
 
 
+def stem_and_remove_stopwords(content):
+    # Download NLTK resources
+    nltk.download('stopwords')
+    print("Stemming and removing stopwords...")
+    ps = PorterStemmer()
+    corpus = []
+    for i in range(len(content)):
+        review = re.sub('[^a-zA-Z]', ' ', content['title'][i])
+        review = review.lower().split()
+        review = [ps.stem(word) for word in review if not word in stopwords.words('english')]
+        review = ' '.join(review)
+        corpus.append(review)
+    return corpus
+
+
 def main():
     # Read dataframe
     path = "WELFake_Dataset.csv"
     df = read_csv_file(path)
+    df = df.head(1000)
 
     # Perform EDA and preprocessing
     EDA(df)
@@ -48,8 +68,9 @@ def main():
     X = df_clean.drop(columns=["label"])
     y = df_clean["label"]
 
-    print(tf.__version__)
-
+    content = X.copy()
+    corpus = stem_and_remove_stopwords(content)
+    print(f"Corpus: \n{corpus}")
 
 
 if __name__ == "__main__":
