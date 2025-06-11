@@ -11,7 +11,7 @@ from tensorflow.keras.models import Sequential
 
 
 # GLOBAL VARIABLES
-vocabulary_size = 10,000  # Size of the vocabulary
+vocabulary_size = 10000  # Size of the vocabulary
 
 
 def read_csv_file(path):
@@ -38,7 +38,7 @@ def preprocess_data(df):
 def stem_and_remove_stopwords(content):
     # Download NLTK resources
     nltk.download('stopwords')
-    print("Stemming and removing stopwords...")
+    print("\nStemming and removing stopwords...")
     ps = PorterStemmer()
     corpus = []
     for i in range(len(content)):
@@ -68,9 +68,14 @@ def main():
     X = df_clean.drop(columns=["label"])
     y = df_clean["label"]
 
+    # Prepare the corpus by stemming and removing stopwords
     content = X.copy()
     corpus = stem_and_remove_stopwords(content)
-    print(f"Corpus: \n{corpus}")
+    print(f"Corpus: \n{corpus[:5]}")
+
+    # One hot encoding representation of the corpus
+    onehot_repr = [one_hot(words, vocabulary_size) for words in corpus]
+    print(f"One-hot representation: \n{onehot_repr[:5]}")
 
 
 if __name__ == "__main__":
