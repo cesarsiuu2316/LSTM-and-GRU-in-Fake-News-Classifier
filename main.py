@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import tensorflow as tf
 import nltk
 import re
@@ -50,6 +51,18 @@ def stem_and_remove_stopwords(content):
     return corpus
 
 
+def create_model(max_length):
+    print("\nCreating LSTM model...")
+    embedding_vector_features = 40  # Size of the embedding vector
+    model = Sequential()
+    model.add(Embedding(vocabulary_size, embedding_vector_features, input_shape = (max_length,)))
+    model.add(LSTM(100))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
+    print(model.summary())
+    return model
+
+
 def main():
     # Read dataframe
     path = "WELFake_Dataset.csv"
@@ -78,10 +91,19 @@ def main():
     print(f"One-hot representation: \n{onehot_repr[1]}")
 
     # Pad sequences to ensure uniform input size
-    tittle_length = 20
-    embedded_docs = pad_sequences(onehot_repr, padding='pre', maxlen=tittle_length)
+    title_length = 20
+    embedded_docs = pad_sequences(onehot_repr, padding='pre', maxlen=title_length)
     print(f"Padded sequences: \n{embedded_docs[1]}")
 
+    # Create the LSTM model
+    model = create_model(title_length)
+
+    # Convert features and labels to numpy arrays
+    X_final = np.array(embedded_docs)
+    y_final = np.array(y)
+    print(f"X_final shape: {X_final.shape}, y_final shape: {y_final.shape}")
+
+    
 
 if __name__ == "__main__":
     main()

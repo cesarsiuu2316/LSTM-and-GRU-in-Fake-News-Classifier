@@ -5,11 +5,12 @@
 
 ## **Steps to Run the Project**
 
-### 1. Clone the repository
+### 1. Clone the repository and download the dataset
 
 ```bash
 git clone https://github.com/cesarsiuu2316/LSTM-and-GRU-in-Fake-News-Classifier.git
 ```
+Download the csv file [Fake_News_Dataset](https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification) and place it into the root folder
 
 ### 2. Create and Activate a Virtual Environment
 It is recommended to use a virtual environment to install dependencies. Follow these steps:
