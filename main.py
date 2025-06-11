@@ -9,6 +9,8 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import one_hot
 from tensorflow.keras.models import Sequential
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
 
 
 # GLOBAL VARIABLES
@@ -63,6 +65,24 @@ def create_model(max_length):
     return model
 
 
+def train_model(model, X_train, y_train, X_test, y_test):
+    print("\nTraining the model...")
+    model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test))
+    print("Model training completed.")
+
+
+def evaluate_model(model, X_test, y_test):
+    print("\nEvaluating the model...")
+    y_pred = model.predict(X_test)
+    y_pred = np.where(y_pred > 0.5, 1, 0)  # Convert probabilities to binary predictions
+    cm = confusion_matrix(y_test, y_pred)
+    accuracy_score_value = accuracy_score(y_test, y_pred)
+    cr = classification_report(y_test, y_pred)
+    print(f"Confusion Matrix:\n{cm}")
+    print(f"Accuracy Score: {accuracy_score_value:.2f}")
+    print(f"Classification Report:\n{cr}")
+
+
 def main():
     # Read dataframe
     path = "WELFake_Dataset.csv"
@@ -103,7 +123,15 @@ def main():
     y_final = np.array(y)
     print(f"X_final shape: {X_final.shape}, y_final shape: {y_final.shape}")
 
-    
+    # Split the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X_final, y_final, test_size=0.2, random_state=42)
+
+    # Train the model
+    train_model(model, X_train, y_train, X_test, y_test)
+
+    # Evaluate the model
+    evaluate_model(model, X_test, y_test)
+
 
 if __name__ == "__main__":
     main()
