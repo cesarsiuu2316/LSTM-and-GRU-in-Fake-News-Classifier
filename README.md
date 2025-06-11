@@ -19,6 +19,13 @@ It is recommended to use a virtual environment to install dependencies. Follow t
 # Create the virtual environment using pip
 python -m venv venv
 ```
+or
+
+```bash
+# if you have multiple python versions
+python3.11 -m venv venv
+```
+
 Activate the virtual environment
 ```bash
 # Activate environment
