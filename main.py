@@ -71,11 +71,16 @@ def main():
     # Prepare the corpus by stemming and removing stopwords
     content = X.copy()
     corpus = stem_and_remove_stopwords(content)
-    print(f"Corpus: \n{corpus[:5]}")
+    print(f"Corpus: \n{corpus[1]}")
 
     # One hot encoding representation of the corpus
     onehot_repr = [one_hot(words, vocabulary_size) for words in corpus]
-    print(f"One-hot representation: \n{onehot_repr[:5]}")
+    print(f"One-hot representation: \n{onehot_repr[1]}")
+
+    # Pad sequences to ensure uniform input size
+    tittle_length = 20
+    embedded_docs = pad_sequences(onehot_repr, padding='pre', maxlen=tittle_length)
+    print(f"Padded sequences: \n{embedded_docs[1]}")
 
 
 if __name__ == "__main__":
