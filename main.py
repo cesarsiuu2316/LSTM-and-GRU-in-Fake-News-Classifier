@@ -65,19 +65,20 @@ def prepare_data(content):
     print(f"One-hot representation: \n{onehot_repr[0]}")
 
     # Pad sequences to ensure uniform input size
-    title_length = 20
+    title_length = max(len(sentence.split()) for sentence in corpus)
     embedded_docs = pad_sequences(onehot_repr, padding='pre', maxlen=title_length)
     print(f"Padded sequences: \n{embedded_docs[0]}")
 
-    return embedded_docs
+    return embedded_docs, title_length
 
 
 def create_model(max_length):
     print("\nCreating LSTM model...")
-    embedding_vector_features = 40  # Size of the embedding vector
+    embedding_vector_features = 100  # Size of the embedding vector
     model = Sequential()
     model.add(Embedding(vocabulary_size, embedding_vector_features, input_shape = (max_length,)))
-    model.add(LSTM(100))  # Dropout in LSTM
+    model.add(LSTM(100)) 
+    model.add(Dropout(0.2))  # Dropout layer to prevent overfitting
     model.add(Dense(1, activation='sigmoid', kernel_regularizer=l2(0.01))) # Regularization to prevent overfitting
     model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
     print(model.summary())
@@ -86,7 +87,7 @@ def create_model(max_length):
 
 def train_model(model, X_train, y_train, X_test, y_test):
     print("\nTraining the model...")
-    model.fit(X_train, y_train, epochs=5, batch_size=64, validation_data=(X_test, y_test))
+    model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test))
     print("Model training completed.")
     joblib.dump(model, 'models/lstm_model.joblib')
 
@@ -104,7 +105,7 @@ def evaluate_model(model, X_test, y_test):
 
 
 def input_data_for_prediction(model, title):
-    docs = prepare_data(pd.DataFrame({'title': [title]}))
+    docs, _ = prepare_data(pd.DataFrame({'title': [title]}))
     prediction = model.predict(docs)
     prediction = np.where(prediction > 0.5, 1, 0)  # Convert probabilities to binary predictions
     return prediction[0][0]
@@ -140,10 +141,9 @@ def main():
 
         # Prepare the data
         content = X.copy()
-        embedded_docs = prepare_data(content)
+        embedded_docs, title_length = prepare_data(content)
 
         # Create the LSTM model
-        title_length = 20
         model = create_model(title_length)
 
         # Convert features and labels to numpy arrays
