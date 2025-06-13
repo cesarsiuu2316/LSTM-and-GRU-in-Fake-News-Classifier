@@ -10,3 +10,7 @@ wheels/
 venv
 
 WELFake_Dataset.csv
+
+models/X_test.joblib
+models/y_test.joblib
+models/lstm_model.joblib
